@@ -52,8 +52,17 @@ It is used to read the content of a file and print to output
 
 ```
 cat /etc/shells
-cat /var/logs/
 ```
+
+**`grep` command**
+
+Search for PATTERN in FILEs (or stdin)
+
+Regex [^2]
+
+Find error in source `unknown value for etag function`
+
+Find which files throw `TypeError`
 
 **Shell Operation**
 
@@ -84,10 +93,7 @@ cat /var/logs/
 use `$?` to get exit status of previous command
 
 > `date "+DATE: %Y-%m-%d %H:%M:%S"` \
-> `date 9999`
-
-**Redirection** [^1]
-There are always three default files open, stdin (the keyboard), stdout (the screen), and stderr (error messages output to the screen). These, and any other open files, can be redirected. Redirection simply means capturing output from a file, command, program, script, or even code block within a script (see Example 3-1 and Example 3-2) and sending it as input to another file, command, program, or script.
+> `cat non-existent-file.txt`
 
 
 **Pipline**
@@ -106,9 +112,6 @@ Two types of output
 
 * `stdout`
 * `stderr`
-
-
-
 
 
 **`grep` command**
@@ -195,3 +198,4 @@ A character that, when unquoted, separates words. A metacharacter is `space`, `
 
 
 [^1] https://tldp.org/LDP/abs/html/io-redirection.html#FTN.AEN17884
+[^2] https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Cheatsheet
