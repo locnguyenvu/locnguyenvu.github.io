@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Bash [part 1]"
+title:  "Introduction to Bash (1)"
 date:   2022-11-14 13:33:47 +0700
 categories: code-academy
 ---
