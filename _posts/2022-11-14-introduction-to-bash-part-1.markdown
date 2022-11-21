@@ -63,7 +63,7 @@ which echo
 Use option `-h` or `--help` to view command usage
 
 
-**`cd`**
+### **`cd`**
 
 Change the shell working directory.
 
@@ -74,9 +74,8 @@ HOME shell variable.
 cd [option...] [dir]
 ```
 
----
 
-**`ls`**
+### **`ls`**
 
 List information about the FILEs (the current directory by default).
 Sort entries alphabetically if none of -cftuvSUX nor --sort is specified.
@@ -102,9 +101,7 @@ Long output format
 |-|:-:|:-:|:-:|
 |`-`: regular file<br/>`l`: symbolic link<br/>`d`: directory<br/>`c`: character-file<br>|`r`: read<br/>`w`: write<br/>`x`: execute| `r`: read<br/>`w`: write<br/>`x`: execute|`r`: read<br/>`w`: write<br/>`x`: execute|
 
----
-
-**`curl`**
+### **`curl`**
 
 curl is a tool for transferring data from or to a server. It supports HTTP, HTTPS, FTP, ... protocols
 
@@ -129,8 +126,8 @@ curl --localtion -O --output-dir ~/Download https://github.com/yagop/node-telegr
 # Download `node-telegram-bot-api` repo to file ~/Download/master.zip
 ```
 
----
-**`uznip`**
+
+### **`uznip`**
 
 Extract zip file
 
@@ -147,8 +144,7 @@ unzip ~/Download/main.zip -d /workspace
 # Extract files to /workspace directory
 ```
 
----
-**`tar`**
+### **`tar`**
 
 GNU 'tar' saves many files together into a single tape or disk archive, and can restore individual files from the archive.
 
@@ -163,9 +159,7 @@ tar -xf archive.tar
 # Extract all files from archive.tar
 ```
 
----
-
-**`grep`**
+### **`grep`**
 
 prints lines that contain a match for one or more patterns.
 
@@ -191,23 +185,16 @@ ls -l node-telegram-bot-api | grep '.eslintrc'
 # Check if repo `node-telegram-bot-api` has eslint configured
 ```
 
-**`sed`**
+### **`sed`**
 
-sed is a stream editor. A stream editor is used to perform basic text transformations on an input stream (a file or input from a pipeline)
+sed is a stream editor. A stream editor is used to perform fundamental text transformations on an input stream (a file or input from a pipeline)
 
 ```
 sed [option...] [sed-command] [file]
 ```
 
 Common option flag
-
-|Flag|Description|
-|-|-|
-|`-n`, `--quiet`, `--silent`| These options disable this automatic printing, and sed only produces output when explicitly told to via the p command.|
-|`-i`, `--in-place` | This option specifies that files are to be edited in-place|
-
-
-sed-command follow this syntax:
+sed-command follows this syntax:
 
 ```
 [addr]X[options]
@@ -240,9 +227,8 @@ sed -i '110a Hello world' node-telegram-bot-api/package.json
 
 https://github.com/cezerin/cezerin/archive/refs/heads/master.zip
 
----
 
-**`ps`**
+### **`ps`**
 
 report a snapshot of the current processes.
 
@@ -270,49 +256,6 @@ ps -C 'python3 app.py' -o pid h
 # Return only PID of process started with command "python3 app.py"
 ```
 
-## Chain operators
-
-**`&&` (AND operator)**
-
-AND Operator will execute the second command only if the First command executes successfully
-
-```
-command 1 && command 2
-```
-
-**`||` (OR operator)**
-
-OR Operator is completely opposite of && Operator. OR Operator will execute the second command only if the First command Fails.
-
-```
-command 1 || command 2
-```
-
-**`|` (PIPE operator)**
-
-PIPE is a kind of operator that can be used to display output of the first command by taking input to the second command. 
-
-```
-command 1 | command 2 <output from command 1>
-
-ps -ef | grep 'python3 app.py'
-# 1. ps command print out a list of process
-# 2. grep read the output of ps command and print line of process with command 'python3 app.py'
-
-ls -lA /etc | grep passwd
-# 1. ls print a item list in directory /etc
-# 2. grep read the output of ls command and print line of item 'passwd'
-```
-
-**`&` (Ampersand Operator)**
-
-Ampersand Operator is a kind of operator which executes given commands in the background
-
-```
-ping localhost &
-# Run the ping command in background
-```
-
 ---
 ## Exercise
 
@@ -327,7 +270,7 @@ ping localhost &
     > `docker exec -it ubuntu bash`
 
 
-### Install postgres
+### Install PostgreSQL
 
 Install via `apt`
 
@@ -338,7 +281,7 @@ apt update
 apt install -y postgresql
 ```
 
-Update **postgresql** config file `/etc/postgresql/14/main/postgresql.conf` with following information
+Update **PostgreSQL** config file `/etc/postgresql/14/main/postgresql.conf` with following information
 
 > `log_destination = 'stderr, csvlog'` \
 > `logging_collector = true` \
@@ -396,9 +339,7 @@ GRANT USAGE ON SCHEMA public TO mckca;
 \q
 ```
 
-
 ### Install application
-
 
 ```
 apt install -y curl python3 python3-pip
@@ -422,24 +363,6 @@ Start application
 python3 app.py
 ```
 
-Start application in the background
-
-
-```
-python3 app.py &
-```
-
-Redirect app output to the log file
-
-```
-# Create log file
-mkdir -p /var/log/flask-example
-touch /var/log/flask-example/app.log
-
-# Start app in background and redirect output to log file
-python3 app.py >> /var/log/flask-example/app.log 2>&1 &
-```
-
 Open browser access link 
 
 * http://localhost:80
@@ -447,12 +370,12 @@ Open browser access link
 * http://localhost:80/users
 
 
-Use `awk` command to read postgresql logs [csv log format defination](https://www.postgresql.org/docs/current/runtime-config-logging.html).
+Use `tail` command to read postgresql logs.
 
 Find clue why the page http://localhost:80/users is slow
 
 ```
-awk -F, '{print $1 "\t|" $8 "\t|" $14}' /var/log/postgresql/<file-name>.csv
+tail -f /var/log/postgresql/<file-name>.log
 ```
 
 Find slow query in source code using grep command
@@ -465,20 +388,4 @@ Remove slow query by `sed` command
 
 ```
 sed -i '1d' query1.sql
-```
-
-Restart the application
-
-
-```
-# Single step
-PID=$(ps h -o pid -C 'python3 app.py')
-kill $PID
-python3 app.py >> /var/log/flask-example/app.log 2>&1 &
-
-# Chain
-kill $(ps h -o pid -C 'python3 app.py') ; python3 app.py >> /var/log/flask-example/app.log 2>&1 &
-
-# Create shortcut
-alias restart_app="kill $(ps h -o pid -C 'python3 app.py') ; python3 app.py >> /var/log/flask-example/app.log 2>&1 &"
 ```
