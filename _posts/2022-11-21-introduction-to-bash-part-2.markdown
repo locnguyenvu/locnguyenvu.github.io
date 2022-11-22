@@ -305,3 +305,9 @@ echo ${parameter//abc/123}
 ## Exercise
 
 Write a installation script for application in [part 1]({% post_url 2022-11-14-introduction-to-bash-part-1 %})
+
+* Uploadload your shell script to (https://gist.github.com)[https://gist.github.com/]
+* Use `curl` to download the bash file and execute
+    ```
+    curl --location https://raw-gist-file.sh | bash
+    ```
