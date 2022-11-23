@@ -57,4 +57,19 @@ When the state of the release branch is ready to become an actual release, you m
 
 Hotfix branches are very much like release branches in that they are also meant to prepare for a new production release, albeit unplanned. They arise from the necessity to act immediately upon an undesired state of a live production version. When a critical bug in a production version must be resolved immediately, a hotfix branch may be branched off from the corresponding tag on the master branch that marks the production version.
 
-When finished, the bugfix needs to be merged back into `master`, it also needs to be merged back into `develop`
+When finished, the bugfix needs to be merged back into `master`; it also needs to be merged back into `develop`
+
+### Applied with Scrum (Agile)
+
+Start with the sprint planning; The team discusses and selects tasks to complete in the sprint. The sprint goal is a reference for the next release of the software.
+
+Each backlog item in the task should be associated with a feature branch, the branch lifetime bound with the task status. When moving a backlog item into In-process state, you create a new branch with a name referring to the task and delete it when it is marked Done. Ideally, for each feature branch, you should create an isolated environment to validate the requirements and merge it to `develop` only when fulfilling all the task's acceptance criteria. Merging feature branches to `develop` should be reviewed and approved by other members
+
+At the end of the sprint, in the review session, the team demonstrates what they have completed and what they left; then, create the release branch that includes completed tasks. To release to the production server, you make a pull request merging to `master`; the pull request triggers deployment checks including automation testing (unit + integration). The release is available when all checks are passed and the pull request turns to green state.
+
+
+## Git flow variant
+
+In actual practice, following Git flow branching model is complex because it requires the `develop` branch to maintain the stability state of the prior release. In the software development world, changes are adapted very quickly - especially in Agile, grouping all features in the same release makes it difficult to draw back a single part.
+
+In tech product companies, new features are bound to business updates, the development process runs parallelly with business campaigns that require a continuous change in a limited time, people tend to minimize the release by skipping the release branch, and feature branches are created directly from `master`. This approach reduces the effort of maintaining `develop` up to date with `master` as the source of truth of feature branches and speeds up the release cycle whenever any feature is ready.
