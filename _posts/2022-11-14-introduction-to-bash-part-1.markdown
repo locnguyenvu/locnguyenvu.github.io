@@ -354,7 +354,12 @@ pip install flask flask-SQLAlchemy python-dotenv psycopg2-binary
 Replace database info on variable DB_URI configuration in `.env` file
 
 ```
-sed -i '1c DB_URI=postgresql://username:password@localhost:5432/dbname'
+sed -i '1c DB_URI=postgresql://mckca:abc123def@localhost:5432/mckca' .env
+
+# OR
+
+sed -i '1s#\(username\|dbname\)#mckca#g' .env
+sed -i '1s/password/abc123def/g' .env
 ```
 
 Start application
