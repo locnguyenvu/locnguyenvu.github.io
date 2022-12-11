@@ -281,13 +281,27 @@ apt update
 apt install -y postgresql
 ```
 
-Update **PostgreSQL** config file `/etc/postgresql/14/main/postgresql.conf` with following information
+Update **PostgreSQL** 2 config files with following information
+
+File `/etc/postgresql/14/main/postgresql.conf`
 
 > `log_destination = 'stderr, csvlog'` \
 > `logging_collector = true` \
 > `log_filename = '%Y-%m-%d_%H%M%S.log'` \
 > `log_directory = '/var/log/postgres'` \
-> `log_statement = 'all'`
+> `log_statement = 'all'` \
+> `password_encryption = md5`
+
+File `/etc/postgresql/14/main/pg_hba.conf`
+
+```
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            md5
+
+# Allow replication connections from localhost, by a user with the
+host    replication     all             127.0.0.1/32            md5
+host    replication     all             ::1/128                 md5
+```
 
 Use `grep` command to identify the location of the config in the file
 
@@ -344,9 +358,9 @@ GRANT USAGE ON SCHEMA public TO mckca;
 ```
 apt install -y curl python3 python3-pip
 
-curl --location https://gitlab.com/crazyfrogs19/mckca/-/archive/main/mckca-main.tar --output /tmp/mckca.tar
+curl --location https://gitlab.com/crazyfrogs19/mckca/-/archive/main/mckca-main.zip --output /tmp/mckca.zip
 
-tar -xf /tmp/mckca.tar --directory /srv
+unzip /tmp/mckca.zip -d /srv
 
 pip install flask flask-SQLAlchemy python-dotenv psycopg2-binary
 ```
@@ -360,6 +374,12 @@ sed -i '1c DB_URI=postgresql://mckca:abc123def@localhost:5432/mckca' .env
 
 sed -i '1s#\(username\|dbname\)#mckca#g' .env
 sed -i '1s/password/abc123def/g' .env
+```
+
+Run migration
+
+```
+psql postgresql://mckca:abc123def@localhost:5432/mckca -f init-db.sql
 ```
 
 Start application

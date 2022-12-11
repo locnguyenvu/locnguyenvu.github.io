@@ -76,7 +76,7 @@ The `hello.txt` currently is in the **working directory**; run the command `git 
 ```
 
 
-A new file was created under file path `a5/c19667710254f835085b99726e523457150e03; if you remove the forward slash - directory delimiter, you will see the path matches with the hashed string of file content.
+A new file was created under file path `a5/c19667710254f835085b99726e523457150e03`; if you remove the forward slash - directory delimiter, you will see the path matches with the hashed string of file content.
 
 Create the first commit
 
@@ -133,13 +133,13 @@ Finally, the **commit** file stores the information of the author who makes chan
 git cat-file -p 91acfacade0f2304724903f60f5648a5060aa011
 # The result
 # tree 67ac38590b37477deff534cc43c90d2e97a5d95a
-# author locnguyenvu <loc_nguyen_vu@mckinsey.com> 1669268362 +0700
-# committer locnguyenvu <loc_nguyen_vu@mckinsey.com> 1669268362 +0700
+# author locnguyenvu <the_email@project.com> 1669268362 +0700
+# committer locnguyenvu <the_email@project.com> 1669268362 +0700
 
 # First commit
 ```
 
-Take a look at the `.git/HEAD; it stores the reference to the current branch.
+Take a look at the `.git/HEAD`; it stores the reference to the current branch.
 
 ```
 cat .git/HEAD
