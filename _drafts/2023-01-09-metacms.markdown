@@ -1,0 +1,15 @@
+We have studied the current workflow of the team. As you can see from the slide, the excel file on the left hand show how the team works on collecting data process. The content in each row is collected separately by a team member, then the team leader has to manage the work of each individual and aggregate it into a single excel file. 
+
+This approach requires a lot of manual work for the content collector; the contents are stored in separate excel files, which leads to the complexity of file management and query for the content at scale.
+
+Our team builds a Content management system (CMS) to bring a better solution alternative to the excel files. All contents are centralized in a database optimized for scale and indexing. With the CMS, the team leader does not need to collect team input separately; they can filter the content base on the unique index generated for each content inserted by the team member. 
+
+Next Huy Do will give an overview of the CMS system.
+
+
+===
+Studied from the current workflow, the team manages the content using excel files, which requires a lot of effort to collect the work of individuals and then aggregate it in a formal format. In addition, when the amount of data increases, the management of excel files is more complex, and it is challenging to index the content.
+
+We build a system that reduces data collection and aggregation workload, and all contents are centralized in a database optimized for scale. With the system, people cooperate on the same platform; To collect data from the team, the leader sends a link that provides a form for each individual to submit their work, and it will automatically centralize all input into one place; the content can be grouped by each workshop event, or can be filtered by its keywords.
+
+Next Huy Do will give an overview of the CMS system.
