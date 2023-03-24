@@ -5,14 +5,14 @@ date:   2023-03-21 13:33:47 +0700
 categories: tech-wiz
 ---
 
-In this article, I'll write about how I read logs in the command line using tools: `grep`, `awk`, `tr`. I also remind some concepts in bash shell including file descriptor, variables, operators 
+This article is about how I read logs in the command line using tools: `grep`, `awk`, `tr`. I also remind some concepts in bash shell including file descriptors, variables, operators 
 
 ## Set up context
 Weeks ago, a colleague introduced the maelstrom platform - which is a set of challenges, by solving those helps me to learn and understand how to implement a distributed system. My task is to write a web server, and maelstrom creates a network of multiple servers that simulate the distributed system.
 
-For the [Growth only counter](https://fly.io/dist-sys/4/) challenge, I need to implement a mechanism to keep track of the global counter among multiple nodes in the cluster.
+For the [Growth only counter](https://fly.io/dist-sys/4/) challenge, it requires implementing a mechanism to keep track of the global counter among multiple nodes in a cluster.
 
-Given a system includes 3 nodes n0, n1, n2; maelstrom sends a set of numbers randomly to each node in the system, and the final result is the sum of all messages sent.
+Given a system includes 3 nodes n0, n1, n2; maelstrom sends a set of numbers randomly to each node in the system, and the final result is the sum of all messages sent. Let's take a look at the example below:
 
 Message set: 
 ```
@@ -29,10 +29,9 @@ The request maelstrom broadcasts to each node are like following
 
 Expected outcome after all messages are sent, each node should return the total count of the message set 
 
-
 At any time during the application is still running, the client sends a request to a node to get the global counter value of `sum[1,2,3,4,5,0,4,2,5,1,3,4]` which is **34**
 
-Run the application on paper. It would be like this.
+There are 2 requests, (1) `add` is to add messages to a node, (2) `read` is to get the global counter. Run the application on paper. It would be like this.
 
 ```
 T01: maelstrom_c -> n0  add  1
@@ -47,13 +46,12 @@ T99: maelstrom_c -> n1 read  34
 T99: maelstrom_c -> n2 read  34
 ```
 
-So my approach was to implement a gossip protocol between nodes, each node will broadcast to neighbors when they receive a message from maelstrom client.
+I wrote an application and it failed on the first run. Next, I'll show you how I debug by reading the application logs.
 
-I spent hours writing beautiful code, and I even feel proud of myself when I review my code multiple times. But the code didn't work as expected.
 
 ## The maelstrom logs structures
 
-For each maelstrom test, it produces a set of files like the following (there are other files but let's skip them). You can download the example [here](/assets/maelstrom.zip)
+For each test run, maelstrom produces a set of log files like the following. You can download the example [here](/assets/maelstrom.zip). These are log files of a failed case.
 
 ```
 .
@@ -64,6 +62,8 @@ For each maelstrom test, it produces a set of files like the following (there ar
 │  └── n2.log
 ├── results.edn
 ```
+
+The meaning of each file: 
 
 * `results.edn`: Analysis results. My test failed because (1) each node returns a different number of the global counter, (2) the expected global counter value is **1291**
     ```
@@ -95,7 +95,7 @@ For each maelstrom test, it produces a set of files like the following (there ar
     0	:invoke	:read	nil
     0	:ok	:read	3
     ```
-* `node-logs/n0.log`, `n1.log`: The STDERR logs from each node. It also log request sent/received by the node. Example
+* `node-logs/n0.log`, `n1.log`: The STDERR logs from each node. It also logs request sent/received by the node. Example
     ```
     2023/03/20 11:04:50 Received {c1 n0 {"type":"init","node_id":"n0","node_ids":["n0","n1","n2"],"msg_id":1}}
     2023/03/20 11:04:50 Node n0 initialized
@@ -109,9 +109,11 @@ For each maelstrom test, it produces a set of files like the following (there ar
     2023/03/20 11:04:50 Received {c8 n0 {"type":"read","msg_id":4}}
     ```
 
+For each log files above, each file has their own format.
+
 ## Read the log
 
-Reading logs is the best way for debugging, the logs themselves contain valuable information about the execution. But sometimes reading logs is not easy especially when the log file is huge.
+Reading log is the best way for debugging, the logs themselves contain valuable information about the execution. But sometimes this work is not easy especially when the log file is huge.
 
 ### Check the counter logic
 
@@ -119,17 +121,17 @@ Reading logs is the best way for debugging, the logs themselves contain valuable
 
 What I want to do is get all requests sent by the maelstrom client to the 3 nodes. 
 
-First let take an overview on the `history.txt` file with the command `wc -l`
+Firstly, let's take an overview of the `history.txt` file with the command `wc -l`
 
 > The wc utility displays the number of lines, words, and bytes contained in each input file, or standard input (if no file is specified) to the standard output.
 
-Count number of lines of the specific file
+Count the number of lines of the specific file
 ```
 wc -l history.txt
 # Output: 3550 history.txt
 ```
 
-Or count number of lines from the stdin
+Or count the number of lines from the stdin
 ```
 cat history.txt | wc -l
 # Output: 3350
@@ -146,12 +148,11 @@ There is a format for request sending from maelstrom client to a node
  0  :invoke :add    3
 (1)   (2)    (3)   (4)
 ```
-This line means - maelstrom sends message "3" to node0. There are 4 columns in the logging template
+This line means - maelstrom sends the message "3" to node0. There are 4 columns in the logging template
 1. The node index
-2. The trigger event (invoke/ok)
-3. The method invoked (add/read)
+2. The event (invoke/ok)
+3. The method (add/read)
 4. The parameter of the request
-
 
 To filter the log for requests adding messages to nodes in the network I use `grep` command
 
@@ -171,7 +172,7 @@ Output:
 Output: 1176 lines (reduce 66% of redudant lines) 
 ```
 
-The output is like the following. It turns out that for each method, there are 2 events (`:invoke`, `:ok`); I only need one event. I continue to use `grep` command on the previous result set to capture the event `:invoke`` only.
+The output is like the following. It turns out that for each method, there are 2 events (`:invoke`, `:ok`); I only need one event. I continue to use `grep` command on the previous result set to capture the event `:invoke` only.
 
 ```
 grep ':add' history.txt | grep ':invoke'
@@ -190,7 +191,7 @@ Now I have filtered the messages sent from the maelstrom client, next I calculat
 >  Awk scans each input file for lines that match any of a set of patterns specified literally in prog or in one or more files specified as -f progfile.  With each pattern there can be an associated action that will be performed when a line of a file matches the pattern. <br/>
 >  An input line is normally made up of fields separated by white space, or by the regular expression FS.  The fields are denoted $1, $2, ..., while $0 refers to the entire line.  If FS is null, the input line is split into one field per character.
 
-For each log line, there are 4 columns separated by \<white-space\> characters. The `awk` parses the format into a table, and it also provides functions to execute on each column. At this step, to get the message I only need to print the fourth column.
+I see the log file has the table-liked format, there are 4 columns separated by \<white-space\> characters. The `awk` parses the format into a table, and it also provides functions to execute on each column. At this step, to get the message I only need to print the fourth column.
 
 ```
 grep ':add' history.txt | grep ':invoke' | awk '{print $4}'
@@ -204,7 +205,15 @@ Output:
 
 The data is cleaner now, the remaining task is to get the total of the message on each line. 
 
-The `while read line` is a common script to process or execute multi lines documents. From the previous step, I have a set of numbers, numbers are separated by new lines `\n`; I use the `while read line` script to read line by line of the dataset; It is like looping through an array and performing execution on each element.
+The `while read line` is a common script to process or execute multi lines documents. You can think a multiple lines file is an array, each line in that file is an element of the array and elements are seperated by newline charactor `\n`. 
+
+Syntax for a while loop in bash shell:
+```
+while [condition]; do
+    # execution
+done
+```
+From the previous step, I have an array of numbers; I use the `while read line` to loop through the array and make execution with each element. For example I will append a phrase "Process with parameter" before each element of each line.
 ```
 grep ':add' history.txt | grep ':invoke' | awk '{print $4}' | \
     while read line; do \
@@ -236,7 +245,7 @@ echo $d
 # Output: 1 + 2
 ```
 
-Now let's sum all messages. I break the process into 3 steps
+Now let's sum up all messages. I break the process into 3 steps
 1. Create `counter` variable starting from 0
 2. Get the dataset
 3. Loop through the dataset and increase the counter with the number on each line
@@ -252,7 +261,7 @@ echo "The global counter is "$counter
 #Output: The global counter is 1291
 ```
 
-Bingo! I had double-checked the counter logic, and sadly confirm that there is something wrong with my code. But what's wrong?
+Bingo! I double-checked the counter logic of maelstrom, and sadly confirm that there is something wrong with my code. But what's wrong?
 
 ### Read the node log
 
@@ -288,13 +297,7 @@ T05 | [1,2,3] | [3,1,2] |
 
 I inspect the log file of node0 at path `node-logs/n0.log`. Let's take an overview
 
-```
-2023/03/20 11:04:50 Received {c1 n0 {"type":"init","node_id":"n0","node_ids":["n0","n1","n2"],"msg_id":1}}
-2023/03/20 11:04:50 Node n0 initialized
-2023/03/20 11:04:50 Sent {"src":"n0","dest":"c1","body":{"in_reply_to":1,"type":"init_ok"}}
-2023/03/20 11:04:50 Received {c8 n0 {"delta":3,"type":"add","msg_id":1}}
-2023/03/20 11:04:50 Sent {"src":"n0","dest":"c8","body":{"in_reply_to":1,"type":"add_ok"}}
-```
+Next I will look into log file of node0 at path `node-logs/n0.log`. I'll filter all request this node received to check if there is a duplication.
 
 For each request the node received, it would have a format like the following:
 ```
@@ -309,10 +312,10 @@ There are 4 fields:
 5. Receiver address
 6. The request payload is the information that is exchanged from node to node or from client to node. Example on the request payload for replicate request
     ```
-    {"msg_id":95,"type":"replicate","values":[1,2,3]}}
+    {"msg_id":95,"type":"replicate","values":[1,2]}
     ```
 
-Again, I want to check if node0 received duplicated messages from the maelstromg client.
+From the node0, it has 3 clients which are the maelstromg client, node1, and node2. Firstly I'll check if node0 recieved duplicated request from maelstrom client.
 
 Check all messages sent to node0 on file `history.txt`. I use regex `^0` to capture lines that have the first character matches `0`.
 
@@ -322,7 +325,7 @@ grep '^0' history.txt| grep ':invoke' | grep ':add' | wc -l
 # Output: 295
 ```
 
-Check all messages node0 received from maelstrom client on file `node-logs/n0.log`. I capture the line has the word `Received`, sent from address start with `c`, and the request payload contains `"type":"add"`
+Check all messages node0 received from maelstrom client on file `node-logs/n0.log`. I capture the line has the word `Received`, sent from address starts with `c`, and the request payload contains `"type":"add"`
 
 ```
 grep 'Received' node-logs/n0.log | grep '{c' | grep '"type":"add"'| wc -l
@@ -334,7 +337,7 @@ The two scripts above return the same result which means __no duplication in req
 
 The two types of requests that take effect on the local storage of node0 are (1) `add` from the maelstrom client and (2) `replicate` from node1 & node2, I have just eliminated the possibility of the first one.
 
-To find the evidence on the duplication of `replicate` requests, I observe the exchange of node0 and node1.
+To find the evidence of the duplicated `replicate` requests, I observe the exchange of node0 and node1.
 
 ```
 grep 'Received' node-logs/n0.log | grep '{n1' | grep '"type":"replicate"'
@@ -360,7 +363,7 @@ grep 'Received' node-logs/n0.log | grep '{n1' | grep '"type":"replicate"' | grep
 
 ![duplicate-requests](/assets/read_log_with_bash_shell_0.png)
 
-Bingo!!! I found it 😇
+Tada!!! I found it 😇
 
 To be sure, I check the batch message with order `3,2,3,1,4,2,3,1,4,3` is unique in the node1 local storage
 
