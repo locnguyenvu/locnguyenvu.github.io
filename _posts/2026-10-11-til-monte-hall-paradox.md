@@ -2,6 +2,7 @@
 layout: post
 title:  "[TIL] Monte Hall paradox"
 date:   2026-10-11 21:05:47 +0700
+math: true
 categories: statistic 
 ---
 
@@ -14,9 +15,11 @@ The scenario is simple: the player selects Door 1. Then the host opens Door 3 an
 My instinct was to stay with Door 1 because the probabilities between Door 1 and Door 2 seemed equivalent: 50/50. It turns out that intuition is not optimal from a statistical perspective.
 
 Given the rules of the game, the prize always exists behind one of the three doors. In the initial state, each door has an equal probability of hiding the prize:
+
 $$
 P(S_1) = P(S_2) = P(S_3) = \frac{1}{3}
 $$
+
 where $P$ represents probability and $S_n$ represents the event that the prize is behind Door $n$.
 
 Since the prize must be behind one of the doors:
@@ -24,29 +27,41 @@ Since the prize must be behind one of the doors:
 $$
 P(S_1) + P(S_2) + P(S_3) = 1
 $$
+
 Once the player chooses Door 1, the probability that the prize is behind either Door 2 or Door 3 is:
+
 $$
 P(S_2) + P(S_3) = \frac{2}{3}
 $$
+
 The host then reveals that Door 3 is empty.
+
 $$
 P(S_2) + 0 = \frac{2}{3}
 $$
+
 Therefore:
+
 $$
 P(S_2) = \frac{2}{3}
 $$
+
 while
+
 $$
 P(S_1) = \frac{1}{3}
 $$
+
 At this point, the math clearly shows that Door 2 has a higher probability than Door 1. The optimal strategy is to switch doors.
+
 $$
 P(S_1) < P(S_2)
 $$
+
 $$
 \frac{1}{3} < \frac{2}{3}
 $$
+
 For me, this was the pivot point.
 
 The revelation was not that Door 2 somehow became lucky. The important insight was that Door 1 never became more likely.
